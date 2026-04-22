@@ -11,7 +11,7 @@ sentence-transformers==4.1.0
 langchain==0.3.25
 langchain-community==0.3.24
 PyYAML==6.0.2
-scikit-learn==1.6.1
+scikit-learn==1.5.2
 torch==2.6.0
 transformers==4.51.3
 tqdm==4.67.1
