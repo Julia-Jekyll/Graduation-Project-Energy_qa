@@ -1,0 +1,40 @@
+# GLM大模型（智谱AI）配置
+glm:
+  api_key: "a574b9abf013436fa099efa7560437cd.42DtYGGGBxHh4bUp"
+  default_model: "glm-4-flash"
+  api_base_url: "https://open.bigmodel.cn/api/paas/v4/"
+
+# LongCat大模型配置
+longcat:
+  api_key: "ak_2oc0rv0MN8r89wx9vA3ES8qX3ZN3g"
+  default_model: "LongCat-Flash-Chat"
+  api_url: "https://api.longcat.chat/openai/v1/chat/completions"
+
+# 通用模型生成参数
+# - temperature：0~1，值越高生成越随机，越低越精准
+# - top_p：0~1，采样阈值，与temperature二选一调优即可
+# - max_tokens：生成文本的最大长度（需匹配模型支持的上限）
+# - timeout：API请求超时时间（秒）
+model_params:
+  temperature: 0.7
+  top_p: 0.8
+  max_tokens: 2048
+  timeout: 30
+
+# RAG（检索增强生成）配置（后续开发用）
+# - vector_db_path：向量数据库本地存储路径
+# - embedding_model：文本嵌入模型（建议使用开源中文模型）
+# - rag_top_k：检索返回的最相关top-k条知识库内容
+# - knowledge_base_path：知识库文件存储路径
+rag:
+  vector_db_path: "./data/energy_vector_db"
+  embedding_model: "BAAI/bge-small-zh-v1.5"
+  rag_top_k: 5
+  knowledge_base_path: "./data/energy_knowledge"
+
+database:
+  host: localhost
+  port: 3306
+  user: root
+  password: Xingqiu1009
+  name: energy_qa
