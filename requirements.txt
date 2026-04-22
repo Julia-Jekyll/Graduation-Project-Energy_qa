@@ -6,13 +6,13 @@ requests==2.32.3
 numpy==2.2.5
 pandas==2.2.3
 openai==1.76.0
-faiss-cpu==1.11.0
+faiss-cpu==1.12.0
 sentence-transformers==4.1.0
 langchain==0.3.25
 langchain-community==0.3.24
 PyYAML==6.0.2
 scikit-learn==1.6.1
-torch==2.7.0
+torch==2.6.0
 transformers==4.51.3
 tqdm==4.67.1
 python-dotenv==1.1.0
