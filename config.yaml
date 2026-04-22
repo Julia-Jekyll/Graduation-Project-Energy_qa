@@ -33,8 +33,8 @@ rag:
   knowledge_base_path: "./data/energy_knowledge"
 
 database:
-  host: localhost
-  port: 3306
+  host: shinkansen.proxy.rlwy.net
+  port: 57840
   user: root
-  password: Xingqiu1009
-  name: energy_qa
+  password: mcqckUgyQHnQsTXQNcuXwDEajuBuRzKT
+  name: railway
