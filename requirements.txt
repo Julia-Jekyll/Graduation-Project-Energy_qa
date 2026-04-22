@@ -3,7 +3,7 @@ Flask-Cors==5.0.0
 gunicorn==23.0.0
 PyMySQL==1.1.1
 requests==2.32.3
-numpy==2.2.5
+numpy==1.26.4
 pandas==2.2.3
 openai==1.76.0
 faiss-cpu==1.12.0
