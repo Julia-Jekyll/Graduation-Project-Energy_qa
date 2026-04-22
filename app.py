@@ -1,7 +1,6 @@
 """
 app.py - 能源管理在线问答系统 Web 服务
 基于 Flask，提供 REST API 供前端调用
-依赖：pip install flask flask-cors
 """
 
 from flask import Flask, request, jsonify, send_from_directory
@@ -9,7 +8,7 @@ from flask_cors import CORS
 import os
 import threading
 
-# ─── 导入已有模块 ──────────────────────────────────────────────────────────────
+#  导入已有模块
 from energy_qa_db import (
     create_session,
     get_session,
@@ -346,7 +345,15 @@ def api_recent_ratings():
 
 # 启动
 if __name__ == "__main__":
-    print("\n 能源管理在线问答系统启动中...")
-    print("   访问地址：http://localhost:5000")
-    print("   按 Ctrl+C 停止服务\n")
-    app.run(host="0.0.0.0", port=5000, debug=False, threaded=True)
+    port = int(os.environ.get("PORT", 5000))
+
+    print("\n能源管理在线问答系统启动中...")
+    print(f"访问地址：http://0.0.0.0:{port}")
+    print("按 Ctrl+C 停止服务\n")
+
+    app.run(
+        host="0.0.0.0",
+        port=port,
+        debug=False,
+        threaded=True
+    )
