@@ -7,7 +7,7 @@ from typing import List, Dict, Tuple
 import numpy as np
 
 # 配置项
-EMBEDDING_MODEL_NAME = r"D:\桌面\毕设\代码相关\bge-large-zh-v1.5"  # 高精度中文嵌入模型
+EMBEDDING_MODEL_NAME = "BAAI/bge-large-zh-v1.5"
 VECTOR_DB_PATH = "./data/energy_vector_db"       # 向量库存储路径
 COLLECTION_NAME = "energy_knowledge"             # 向量库集合名
 CHUNK_SIZE = 300                                 # 适配能源政策文本的分块大小
