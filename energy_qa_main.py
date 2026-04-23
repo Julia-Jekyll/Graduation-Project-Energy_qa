@@ -29,14 +29,8 @@ from energy_qa_db import (
     get_stats,
 )
 
-# 向量数据库导入 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-try:
-    from utils.vector_db_manager import EnergyVectorDB
-except ImportError as e:
-    print(f"警告：向量数据库模块导入失败：{e}")
-    print("   请确保 utils/vector_db_manager.py 文件存在，将禁用RAG功能")
-    EnergyVectorDB = None
+# 向量数据库已禁用（云端纯 API 模式）
+EnergyVectorDB = None
 
 # 全局配置 
 config = load_config()
@@ -137,55 +131,18 @@ def _build_longcat_client() -> BaseAPIClient:
     )
 
 
-# RAG 检索层
+# RAG 检索层（云端纯 API 模式：向量库已禁用）
 class RAGRetriever:
     """封装向量库检索，返回带来源标注的知识片段"""
 
+    """云端模式下的 RAG 占位符，始终返回空结果，由网络搜索兜底"""
+
     def __init__(self):
-        self.enabled = EnergyVectorDB is not None
-        self.top_k = config["rag"].get("rag_top_k", 5)
-        if self.enabled:
-            try:
-                self.db = EnergyVectorDB()
-            except Exception as e:
-                print(f"警告：向量库初始化失败，RAG 已禁用：{e}")
-                self.enabled = False
+        self.enabled = False
+        print("   RAG 检索：已禁用（云端纯 API 模式，无需本地向量库）")
 
     def retrieve(self, query: str, top_k: int = None) -> tuple[str, list[dict]]:
-        """
-        检索并返回 (格式化展示文本, 原始结果列表)
-        每条结果包含 source（文件名）、similarity、text
-        返回空列表表示向量库中无相关内容，调用方应触发网络搜索兜底
-        """
-        if not self.enabled:
-            return "（RAG 已禁用）", []
-
-        k = top_k or self.top_k
-        try:
-            raw = self.db.retrieve_knowledge(query, top_k=k)
-            if not raw:
-                return "未检索到相关内容", []
-
-            display_lines = [f"检索到 {len(raw)} 条结果：\n"]
-            structured = []
-            for i, r in enumerate(raw, 1):
-                source = r.get("source", "未知来源")
-                sim = round(r.get("similarity") or r.get("score") or 0.0, 4)
-                text = r.get("text", "").strip()
-                preview = text[:200] + "..." if len(text) > 200 else text
-                display_lines.append(
-                    f"  [{i}] 来源：{source}\n"
-                    f"      相似度：{sim}\n"
-                    f"      内容预览：{preview}\n"
-                )
-                structured.append({"source": source, "similarity": sim, "text": text})
-
-            return "\n".join(display_lines), structured
-
-        except Exception as e:
-            msg = f"警告：RAG 检索失败：{e}"
-            print(msg)
-            return msg, []
+        return "（RAG 已禁用）", []
 
 
 # 网络搜索兜底 
@@ -303,30 +260,23 @@ def _build_subtask_prompt(subtask: dict, knowledge_chunks: list[dict], web_conte
 def _execute_single_subtask(
     subtask: dict,
     longcat: BaseAPIClient,
-    retriever: RAGRetriever,
+    retriever: RAGRetriever,   # 保留参数签名兼容性，云端模式下不实际调用
     semaphore,
 ) -> dict:
     """
-    执行单个子任务（RAG 检索 → 网络搜索兜底 → LongCat 推理），线程安全。
-    knowledge_source: "rag" | "web" | "none"
+    执行单个子任务（云端纯 API 模式：网络搜索兜底 → LongCat 推理），线程安全。
+    knowledge_source: "web" | "none"
     """
     task_id = subtask["id"]
     query = subtask["query"]
 
     with semaphore:
-        print(f"\n   [子任务 {task_id}] 向量库检索：{query[:40]}...")
-        _, knowledge_chunks = retriever.retrieve(query)
-
-        web_content = ""
-        if knowledge_chunks:
-            knowledge_source = "rag"
-            sources = list({c["source"] for c in knowledge_chunks})
-            print(f"   [子任务 {task_id}] 向量库命中，来源：{sources}")
-        else:
-            print(f"   [子任务 {task_id}] 向量库无结果，触发网络搜索兜底")
-            _, web_content = web_search_fallback(query)
-            knowledge_source = "web" if web_content else "none"
-            sources = []
+        # 云端模式：跳过向量库，直接使用网络搜索
+        knowledge_chunks = []
+        print(f"\n   [子任务 {task_id}] 网络搜索：{query[:40]}...")
+        _, web_content = web_search_fallback(query)
+        knowledge_source = "web" if web_content else "none"
+        sources = []
 
         prompt = _build_subtask_prompt(subtask, knowledge_chunks, web_content)
         messages = [
@@ -487,11 +437,10 @@ class MultiStepPipelineClient:
         self.glm = _build_glm_client()
         self.longcat = _build_longcat_client()
         self.retriever = RAGRetriever()
-        rag_status = "已启用" if self.retriever.enabled else "已禁用（向量库不可用）"
-        print(f"\nMultiStepPipelineClient 初始化完成")
+        print(f"\nMultiStepPipelineClient 初始化完成（云端纯 API 模式）")
         print(f"   GLM 模型：{self.glm.default_model}")
         print(f"   LongCat 模型：{self.longcat.default_model}")
-        print(f"   RAG 检索：{rag_status}")
+        print(f"   RAG 检索：已禁用（网络搜索兜底）")
 
     def ask(self, user_question: str) -> dict:
         """
