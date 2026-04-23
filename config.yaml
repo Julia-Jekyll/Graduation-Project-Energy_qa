@@ -19,7 +19,7 @@ model_params:
   temperature: 0.7
   top_p: 0.8
   max_tokens: 2048
-  timeout: 30
+  timeout: 25
 
 # RAG（检索增强生成）配置（后续开发用）
 # - vector_db_path：向量数据库本地存储路径

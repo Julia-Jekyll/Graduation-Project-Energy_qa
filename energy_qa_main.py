@@ -419,7 +419,7 @@ def step3_synthesize(
         {"role": "system", "content": SYNTHESIS_SYSTEM_PROMPT},
         {"role": "user", "content": prompt},
     ]
-    answer = glm.call(messages, temperature=0.4, max_tokens=2048)
+    answer = glm.call(messages, temperature=0.4, max_tokens=1024)
     print("   最终答案生成完成")
     return answer
 
